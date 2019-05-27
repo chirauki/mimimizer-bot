@@ -20,7 +20,7 @@ func mimimize(in string) string {
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Warning("Error loading .env file. Will not be used.")
 	}
 
 	token, ok := os.LookupEnv("TB_KEY")
