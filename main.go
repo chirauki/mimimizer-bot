@@ -12,11 +12,15 @@ import (
 )
 
 func mimimize(in string) string {
+	result := in
+
 	r, _ := regexp.Compile("[aàáeèêoòóuùú]")
 	rCaps, _ := regexp.Compile("[AÀÁEÈÉIÍÌOÒÓUÙÚ]")
-	out := r.ReplaceAllString(in, "i")
-	out = rCaps.ReplaceAllString(in, "I")
-	return out
+
+	result = r.ReplaceAllString(result, "i")
+	result = rCaps.ReplaceAllString(result, "I")
+
+	return result
 }
 
 func main() {
