@@ -92,6 +92,8 @@ func main() {
 		if m.IsReply() {
 			originalMessage := m.ReplyTo
 			mimimized := mimimize(originalMessage.Text)
+
+			b.Delete(m)
 			b.Reply(originalMessage, mimimized)
 		}
 	})
