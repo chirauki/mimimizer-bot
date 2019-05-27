@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"regexp"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -26,35 +23,45 @@ func main() {
 		log.Warning("Error loading .env file. Will not be used.")
 	}
 
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("$PORT must be set")
-	}
-
-	router := gin.New()
-	router.Use(gin.Logger())
-
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusNoContent, "", nil)
-	})
-
-	router.Run(":" + port)
-
 	token, ok := os.LookupEnv("TB_KEY")
 	if !ok {
 		log.Fatal("Env var with telegram token key is not found!")
 		return
 	}
 
-	b, err := tb.NewBot(tb.Settings{
-		Token:  token,
-		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
-	})
+	var b *tb.Bot
 
-	if err != nil {
-		log.Fatal(err)
-		return
+	port, portExists := os.LookupEnv("PORT")
+	if !portExists {
+		log.Info("PORT env var does not exist. Using long poller")
+
+		b, err = tb.NewBot(tb.Settings{
+			Token:  token,
+			Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+		})
+
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	} else {
+		log.Info("PORT env var exists. Using webhook poller")
+
+		webhook := &tb.Webhook{
+			Listen:   ":" + port,
+			Endpoint: &tb.WebhookEndpoint{PublicURL: os.Getenv("PUBLIC_URL")},
+		}
+
+		pref := tb.Settings{
+			Token:  token,
+			Poller: webhook,
+		}
+
+		b, err = tb.NewBot(pref)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 	}
 
 	b.Handle(tb.OnQuery, func(q *tb.Query) {
