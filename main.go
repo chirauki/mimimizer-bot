@@ -67,7 +67,7 @@ func main() {
 	}
 
 	b.Handle(tb.OnQuery, func(q *tb.Query) {
-		log.Info(fmt.Sprintf("%v", q))
+		log.Info(fmt.Sprintf("Received inline query from user '%s' with text: %s", q.From.Username, q.Text))
 
 		result := &tb.ArticleResult{
 			Text:  mimimize(q.Text),
