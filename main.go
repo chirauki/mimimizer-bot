@@ -93,7 +93,10 @@ func main() {
 			originalMessage := m.ReplyTo
 			mimimized := mimimize(originalMessage.Text)
 
-			b.Delete(m)
+			err = b.Delete(m)
+			if err != nil {
+				log.Error(err)
+			}
 			b.Reply(originalMessage, mimimized)
 		}
 	})
