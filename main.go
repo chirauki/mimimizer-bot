@@ -46,10 +46,12 @@ func main() {
 		}
 	} else {
 		log.Info("PORT env var exists. Using webhook poller")
+		publicURL := os.Getenv("PUBLIC_URL")
+		log.Info(fmt.Sprintf("Webhook public URL is: %s", publicURL))
 
 		webhook := &tb.Webhook{
 			Listen:   ":" + port,
-			Endpoint: &tb.WebhookEndpoint{PublicURL: os.Getenv("PUBLIC_URL")},
+			Endpoint: &tb.WebhookEndpoint{PublicURL: publicURL},
 		}
 
 		pref := tb.Settings{
