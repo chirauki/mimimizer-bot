@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"regexp"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"github.com/gin-gonic/gin"
+	_ "github.com/heroku/x/hmetrics/onload"
 )
 
 func mimimize(in string) string {
@@ -22,6 +25,23 @@ func main() {
 	if err != nil {
 		log.Warning("Error loading .env file. Will not be used.")
 	}
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.LoadHTMLGlob("templates/*.tmpl.html")
+	router.Static("/static", "static")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl.html", nil)
+	})
+
+	router.Run(":" + port)
 
 	token, ok := os.LookupEnv("TB_KEY")
 	if !ok {
