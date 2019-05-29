@@ -14,7 +14,7 @@ import (
 func mimimize(in string) string {
 	result := in
 
-	r, _ := regexp.Compile("[aàáeèêoòóuùú]")
+	r, _ := regexp.Compile("[aàáeèéoòóuùú]")
 	rCaps, _ := regexp.Compile("[AÀÁEÈÉIÍÌOÒÓUÙÚ]")
 
 	result = r.ReplaceAllString(result, "i")
